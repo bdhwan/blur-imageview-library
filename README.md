@@ -5,7 +5,7 @@
 add you app dependency
 
 ```java
-compile 'com.altamirasoft.blurimageview:blurimageview:1.0.4'
+compile 'com.altamirasoft.blurimageview:blurimageview:1.0.2'
 ```
 
 
