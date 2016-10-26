@@ -1,4 +1,28 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release' // must be applied after your artifact generating plugin (eg. java / com.android.library)
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+
+
+publish {
+    userOrg = 'bdhwan'
+    repoName = 'vxmaker'
+    groupId = 'com.altamirasoft.blurimageview'
+    artifactId = 'blurimageview'
+    publishVersion = genVersionName()
+    desc = 'blur image view for android'
+    website = 'https://github.com/bdhwan/blur-imageview-library'
+}
+
+
 
 android {
     compileSdkVersion 24
@@ -7,8 +31,9 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode gitVersion()
+        versionName genVersionName()
+
 
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
@@ -26,3 +51,41 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:24.2.1'
 }
+
+
+
+
+def gitVersion() {
+
+    def process = "git rev-list master --first-parent --count".execute()
+    def result = process.text.trim()
+    if (result == "") {
+        return 1
+    } else {
+        return result.toInteger()
+    }
+}
+
+def genVersionName() {
+    return '1.0.'+gitVersion()
+}
+
+
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('release/')
+    include('classes.jar')
+    rename ('classes.jar', "blurimageview_v_"+ gitVersion()+'.jar')
+
+}
+
+task clearJar(type: Delete) {
+    delete fileTree(dir:'release',include:['*.jar'])
+}
+
+
+makeJar.dependsOn(clearJar, build)
+
+
+
